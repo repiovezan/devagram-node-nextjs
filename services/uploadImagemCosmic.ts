@@ -4,26 +4,25 @@ import { write } from "fs";
 
 const {
     CHAVE_GRAVACAO_AVATARES,
-    CHAVE_GRAVACAO_PUBLICAOES,
+    CHAVE_GRAVACAO_PUBLICACOES,
     BUCKET_AVATARES,
-    BUCKET_PUBLICACOES } = process.env;
+    BUCKET_PUBLICACOES} = process.env;
 
 const Cosmic = cosmicjs();
 const bucketAvatares = Cosmic.bucket({
-    slug : BUCKET_AVATARES,
+    slug: BUCKET_AVATARES,
     write_key: CHAVE_GRAVACAO_AVATARES
 });
 
 const bucketPublicacoes = Cosmic.bucket({
-    slug : BUCKET_PUBLICACOES,
-    write_key : CHAVE_GRAVACAO_PUBLICAOES
+    slug: BUCKET_PUBLICACOES,
+    write_key: CHAVE_GRAVACAO_PUBLICACOES
 });
 
 const storage = multer.memoryStorage();
-const upload = multer({storage : storage});
+const updload = multer({storage : storage});
 
 const uploadImagemCosmic = async(req : any) => {
-    console.log('uploadrequisicaoimagem', req)
     if(req?.file?.originalname){
 
         if(!req.file.originalname.includes('.png') &&
@@ -36,6 +35,7 @@ const uploadImagemCosmic = async(req : any) => {
             originalname: req.file.originalname,
             buffer : req.file.buffer
         };
+
         if(req.url && req.url.includes('publicacao')){
             return await bucketPublicacoes.addMedia({media : media_object});
         }else{
@@ -44,4 +44,4 @@ const uploadImagemCosmic = async(req : any) => {
     }
 }
 
-export {upload, uploadImagemCosmic}
+export {updload, uploadImagemCosmic};

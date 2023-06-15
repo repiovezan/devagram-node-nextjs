@@ -1,14 +1,14 @@
-import type { NextApiRequest , NextApiResponse } from "next";
-import type { RespostaPadraoMsg } from '../../types/RespostaPadraoMsg';
+import type {NextApiRequest, NextApiResponse} from 'next';
+import type {RespostaPadraoMsg} from '../../types/RespostaPadraoMsg';
 import type {CadastroRequisicao} from '../../types/CadastroRequisicao';
-import {UsuarioModel} from '../../models/UsuarioModel'
+import {UsuarioModel} from '../../models/UsuarioModel';
+import {conectarMongoDB} from '../../middlewares/conectarMongoDB';
 import md5 from 'md5';
-import {conectarMongoDB} from "../../middlewares/conectarMongoDB";
-import {upload, uploadImagemCosmic} from '../../services/uploadImagemCosmic';
+import {updload, uploadImagemCosmic} from '../../services/uploadImagemCosmic';
 import nc from 'next-connect';
 
 const handler = nc()
-    .use(upload.single('file'))
+    .use(updload.single('file'))
     .post(async (req : NextApiRequest, res : NextApiResponse<RespostaPadraoMsg>) => {
         try{
             const usuario = req.body as CadastroRequisicao;
