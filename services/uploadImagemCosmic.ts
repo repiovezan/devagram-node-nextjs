@@ -3,12 +3,14 @@ import multer from 'multer';
 
 const {
     BUCKET_SLUG,
+    BUCKET_READKEY,
     BUCKET_WRITEKEY} = process.env;
 
 const cosmic = createBucketClient({
-    bucketSlug:BUCKET_SLUG,
-    writeKey:BUCKET_WRITEKEY
-})
+    bucketSlug: BUCKET_SLUG,
+    readKey: BUCKET_READKEY,
+    writeKey: BUCKET_WRITEKEY
+});
 
 const storage = multer.memoryStorage();
 const updload = multer({storage : storage});
@@ -27,11 +29,10 @@ const uploadImagemCosmic = async(req : any) => {
             buffer : req.file.buffer
         };
 
-        let folder = "AVATARES"
+        let folder = "avatares"
         if(req.url && req.url.includes('publicacao')){
-            folder = "PUBLICACAO"
+            folder = "publicacoes"
         }
-        console.log(media_object)
         return await cosmic.media.insertOne({
             media: media_object,
             folder: folder
