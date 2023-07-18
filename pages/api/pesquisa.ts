@@ -1,60 +1,34 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { conectarMongoDB } from '../../middlewares/conectarMongoDB';
-import { validarTokenJWT } from '../../middlewares/validarTokeJWT';
-import { UsuarioModel } from '../../models/UsuarioModel';
+import {conectarMongoDB} from '../../middlewares/conectarMongoDB';
 import type { RespostaPadraoMsg } from '../../types/RespostaPadraoMsg';
+import {UsuarioModel} from '../../models/UsuarioModel'
+import { validarTokenJWT } from '@/middlewares/validarTokeJWT';
 
 const pesquisaEndpoint
-    = async (req: NextApiRequest, res: NextApiResponse<RespostaPadraoMsg | any[]>) => {
-        try {
-            if (req.method === 'GET') {
-                if (req?.query?.id) {
-                    const usuarioEncontrado = await UsuarioModel.findById(req?.query?.id);
-                    if (!usuarioEncontrado) {
-                        return res.status(400).json({ erro: 'Usuario nao encontrado' });
-                    }
+    = async (req : NextApiRequest , res: NextApiResponse<RespostaPadraoMsg | any[]>) =>{
 
-                    const user = {
-                        senha: null,
-                        segueEsseUsuario: false,
-                        nome: usuarioEncontrado.nome,
-                        email: usuarioEncontrado.email,
-                        _id: usuarioEncontrado._id,
-                        avatar: usuarioEncontrado.avatar,
-                        seguidores: usuarioEncontrado.seguidores,
-                        seguindo: usuarioEncontrado.seguindo,
-                        publicacoes: usuarioEncontrado.publicacoes,
-                    } as any;
+    try{
+        if(req.method === 'GET'){
 
-                    const segueEsseUsuario = await SeguidorModel.find({ usuarioId: req?.query?.userId, usuarioSeguidoId: usuarioEncontrado._id });
-                    if (segueEsseUsuario && segueEsseUsuario.length > 0) {
-                        user.segueEsseUsuario = true;
-                    }
-                    return res.status(200).json(user);
-                } else {
-                    const { filtro } = req.query;
-                    if (!filtro || filtro.length < 2) {
-                        return res.status(400).json({ erro: 'Favor informar pelo menos 2 caracteres para a busca' });
-                    }
-
-                    const usuariosEncontrados = await UsuarioModel.find({
-                        $or: [{ nome: { $regex: filtro, $options: 'i' } },
-                            //{ email : {$regex : filtro, $options: 'i'}}
-                        ]
-                    });
-
-                    usuariosEncontrados.forEach(userFound => {
-                        userFound.senha = null
-                    });
-
-                    return res.status(200).json(usuariosEncontrados);
-                }
+            const {filtro} = req.query;
+            if(!filtro || filtro.length < 2){
+                return res.status(400).json({erro : 'Favor informar mais caractéres para a busca.'})
             }
-            return res.status(405).json({ erro: 'Metodo informado nao e valido' });
-        } catch (e) {
-            console.log(e);
-            return res.status(500).json({ erro: 'Nao foi possivel buscar usuarios:' + e });
-        }
-    }
 
-export default (validarTokenJWT(conectarMongoDB(pesquisaEndpoint)));
+            const usariosEncontrados = await UsuarioModel.find({
+                $or: [{nome : {$regex : filtro, $options : 'i'}}, 
+                {email : {$regex : filtro, $options : 'i'}}] 
+                
+            });
+
+            return res.status(200).json(usariosEncontrados);
+        }
+        return res.status(405).json({erro : 'Método informado não é válido.'})
+
+    }catch(e){
+        console.log(e);
+        return res.status(500).json({erro : 'Não foi possível buscar usuário.'})
+    }
+}
+
+export default validarTokenJWT(conectarMongoDB(pesquisaEndpoint));
