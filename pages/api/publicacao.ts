@@ -1,11 +1,12 @@
 import type {NextApiResponse} from 'next';
-import type { RespostaPadraoMsg } from '../../types/RespostaPadraoMsg';
+import type {RespostaPadraoMsg} from '../../types/RespostaPadraoMsg';
 import nc from 'next-connect';
 import {updload, uploadImagemCosmic} from '../../services/uploadImagemCosmic';
 import {conectarMongoDB} from '../../middlewares/conectarMongoDB';
 import {validarTokenJWT} from '../../middlewares/validarTokeJWT';
 import {PublicacaoModel} from '../../models/PublicacaoModel';
 import {UsuarioModel} from '../../models/UsuarioModel';
+
 
 const handler = nc()
     .use(updload.single('file'))
@@ -38,7 +39,7 @@ const handler = nc()
                 data : new Date()
             }
 
-            usuario.publicacoes;
+            usuario.publicacoes++;
             await UsuarioModel.findByIdAndUpdate({_id : usuario._id}, usuario);
 
             await PublicacaoModel.create(publicacao);
